@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vote</title>
+    <style>
+        *{ margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif; }
+        body{ background:#f5f5f5; }
+        header{ background:#00843D; padding:15px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; }
+        header img{ height:45px; }
+        header h1{ color:white; font-size:32px; }
+        .container{ padding:15px; }
+        .card{ background:white; padding:20px; border-radius:15px; margin-bottom:15px; box-shadow:0 2px 10px rgba(0,0,0,.1); }
+        .name{ font-size:20px; font-weight:bold; margin-bottom:15px; }
+        .buttons{ display:flex; gap:10px; }
+        .count{ background:#FFD700; padding:10px 15px; border:none; border-radius:10px; font-weight:bold; }
+        .vote{ background:#00843D; color:white; padding:10px 20px; border:none; border-radius:10px; cursor:pointer; font-weight:bold; }
+        .vote:disabled { background: #cccccc; cursor: not-allowed; }
+        
+        /* Qoraalka cusub ee ka sarreeya footer-ka */
+        .promo-text { text-align: center; font-size: 22px; font-weight: bold; color: #00843D; margin: 30px 0 15px 0; }
+        
+        footer{ background:#00843D; color:white; padding:25px; text-align:center; border-top-left-radius:30px; border-top-right-radius:30px; box-shadow:0 -3px 10px rgba(0,0,0,.2); }
+        footer h2{ color:#FFD700; margin-bottom:10px; }
+        .popup{ display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.7); justify-content:center; align-items:center; }
+        .form-box{ background:white; width:90%; max-width:350px; padding:25px; border-radius:20px; text-align:center; }
+        .form-box h2{ margin-bottom:20px; color:#00843D; }
+        input{ width:100%; padding:12px; margin-bottom:15px; border:1px solid #ccc; border-radius:10px; }
+        .submit{ background:#00843D; color:white; border:none; padding:12px; width:100%; border-radius:10px; font-size:16px; cursor:pointer; }
+        .message{ display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:25px; border-radius:20px; font-size:25px; font-weight:bold; color:#00843D; animation:zoom 1s infinite alternate; z-index: 100; }
+        @keyframes zoom{ from{ transform:translate(-50%,-50%) scale(1); } to{ transform:translate(-50%,-50%) scale(1.1); } }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="logo.png" alt="Logo">
+    <h1>Vote</h1>
+</header>
+
+<div class="container">
+    <div class="card">
+        <div class="name">Muhsin Hassan</div>
+        <div class="buttons">
+            <button class="count">61 Vote</button>
+            <button class="vote" onclick="openForm('Muhsin Hassan')">Vote</button>
+        </div>
+    </div>
+    <div class="card">
+        <div class="name">Abdi Shire</div>
+        <div class="buttons">
+            <button class="count">58 Vote</button>
+            <button class="vote" onclick="openForm('Abdi Shire')">Vote</button>
+        </div>
+    </div>
+    <div class="card">
+        <div class="name">Mohamoud Jamac</div>
+        <div class="buttons">
+            <button class="count">43 Vote</button>
+            <button class="vote" onclick="openForm('Mohamoud Jamac')">Vote</button>
+        </div>
+    </div>
+    <div class="card">
+        <div class="name">Muuse Yuusuf</div>
+        <div class="buttons">
+            <button class="count">23 Vote</button>
+            <button class="vote" onclick="openForm('Muuse Yuusuf')">Vote</button>
+        </div>
+    </div>
+</div>
+
+<div class="promo-text">Nala Dooro Digital Marketer-kayaga</div>
+
+<footer>
+    <h2>DAHABSHIIL</h2>
+    <p>Fast • Secure • Reliable</p>
+</footer>
+
+<div class="popup" id="popup">
+    <form class="form-box" id="voteForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <h2>Vote Form</h2>
+        <input type="hidden" name="Voted For" id="votedFor">
+        
+        <input type="text" name="Instagram Username" placeholder="Instagram Username" required>
+        <input type="email" name="Email Address" placeholder="Email Address" required>
+        <button type="submit" class="submit">Submit Vote</button>
+    </form>
+</div>
+
+<div class="message" id="msg">
+    Thank You For Voting ❤️
+</div>
+
+<script>
+    let selectedCandidate = "";
+
+    // Hubi haddii qofku horay u codeeyey markay bogga soo furaan
+    window.onload = function() {
+        if (localStorage.getItem("hasVoted")) {
+            disableVoting();
+        }
+    }
+
+    function openForm(candidateName){
+        if (localStorage.getItem("hasVoted")) {
+            alert("Horay ayaad u codeysay, laguma soo celin karo!");
+            return;
+        }
+        selectedCandidate = candidateName;
+        document.getElementById("votedFor").value = candidateName;
+        document.getElementById("popup").style.display = "flex";
+    }
+
+    // Markay form-ka soo gudbiyaan
+    document.getElementById("voteForm").addEventListener("submit", function(e) {
+        e.preventDefault(); // Jooji in boggu dib u load-gariiro guud ahaan
+        
+        let form = this;
+        let formData = new FormData(form);
+
+        // U dir xogta Formspree
+        fetch(form.action, {
+            method: form.method,
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                // Halkan ku kaydi in qofku codeeyey braowsarkiisa
+                localStorage.setItem("hasVoted", "true");
+                
+                document.getElementById("popup").style.display = "none";
+                document.getElementById("msg").style.display = "block";
+                
+                disableVoting();
+                form.reset();
+
+                setTimeout(function(){
+                    document.getElementById("msg").style.display = "none";
+                }, 4000);
+            } else {
+                alert("Cillad ayaa dhacday, fadlan dib u tijaabi.");
+            }
+        }).catch(error => {
+            alert("Cillad dhanka internet-ka ah ayaa dhacday.");
+        });
+    });
+
+    // Function curyaaminaya badhamada haddii la codeeyey
+    function disableVoting() {
+        let buttons = document.querySelectorAll(".vote");
+        buttons.forEach(btn => {
+            btn.innerText = "Voted";
+            btn.disabled = true;
+        });
+    }
+</script>
+
+</body>
+</html>
